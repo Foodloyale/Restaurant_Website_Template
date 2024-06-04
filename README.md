@@ -19,15 +19,15 @@ The Functionalities includes:
 ##
 ## Pre-requisites
 1. This template was created using the Asp.net Core Framework. Thus, its usage requires knowledge of the Framework.
-2. No prior knowledge of Asp.net Core? Visit the Swagger UI [here](https://foodloyaleopenapi.azurewebsites.net/swagger) to consume the REST API endpoints for the framework of your choice.
+2. No prior knowledge of Asp.net Core? Visit the Swagger UI [here](https://api.foodloyale.com/swagger) to consume the REST API endpoints for the framework of your choice.
 3. An API Key - This can be obtained from the 'Connect your Website and Mobile app' settings section of the POS app.
 
 ##
 ## How to spin up your website
 
 1. Load your Products into the POS app.
-2. Select your Payment Processor from the **Payment Settings** section of the POS.
-3. Get an API Key from the **Connect your Website and Mobile app** settings section of the POS.
+2. Select your Payment Processor from the **Integration Settings** section of the POS.
+3. Get an API Key from the **Acount** settings section of the POS.
 4. CLone this template
 5. Insert the API Key into the Appsettings.json file.
 6. Open the command line and use **dotnet run**
