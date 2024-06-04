@@ -32,3 +32,8 @@ The Functionalities includes:
 5. Insert the API Key into the Appsettings.json file.
 6. Open the command line and use **dotnet run**
 
+##
+## Good to know
+1. ### File Layouts
+2. ### Browser Compatibity
+
