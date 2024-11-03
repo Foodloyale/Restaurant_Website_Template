@@ -6,6 +6,7 @@ using restaurant_demo_website.ViewModels;
 using Microsoft.Extensions.Caching.Memory;
 using FoodloyaleApi.Models;
 using System.Globalization;
+using System.Collections;
 
 namespace restaurant_demo_website.Controllers
 {
@@ -15,7 +16,8 @@ namespace restaurant_demo_website.Controllers
         private IMemoryCache _memoryCache;
        
 
-        private static IEnumerable<Product> products { get; set; }
+        private IEnumerable<Stocks> stocks { get; set; }
+        public List<Product> products {get;set;} = new List<Product>();
 
         public MenuController(IEntitiesRequest entitiesRequest, IMemoryCache memoryCache)
         {
@@ -34,8 +36,9 @@ namespace restaurant_demo_website.Controllers
             ApplicationUser restaurantinfo = await GetCache();
             bool opened = false;
             ViewData["RestaurantName"] = restaurantinfo.BusinessName;
+            
             var pr = await _entitiesRequest.GetProductsAsync();
-            products = pr.Where(p=>p.IsDeleted == false);
+            stocks = pr.Where(p=>!p.IsExpired);
 
             var dayopentimes = restaurantinfo.OpeningTimes.FirstOrDefault(o => o.Day == DateTime.Now.DayOfWeek.ToString());
             if (dayopentimes != null)
@@ -47,13 +50,13 @@ namespace restaurant_demo_website.Controllers
 
             List<string> categories = new List<string>();
 
-            if (products.Any())
+            if (stocks.Any())
             {
-                foreach (var p in products)
+                foreach (var stk in stocks)
                 {
-                    
-                        p.imgUrl = GetImagesFromByteArray(p.photosUrl);
-                        categories.Add(p.Category);
+                        products.Add(stk.Product);
+                        stk.Product.imgUrl = GetImagesFromByteArray(stk.Product.photosUrl);
+                        categories.Add(stk.Product.Category);
 
                 }
                 categories = categories.Distinct().ToList();
@@ -108,8 +111,8 @@ namespace restaurant_demo_website.Controllers
         /// <returns></returns>
         public async Task<IActionResult> DetailsAsync(int id)
         {
-            var pr = await _entitiesRequest.GetProductsAsync();
-            Product product = pr.FirstOrDefault(p => p.ProductID == id);
+            var stk = await _entitiesRequest.GetProductsAsync();
+            Product product = stk.FirstOrDefault(p => p.ProductID == id).Product;
             product.imgUrl = GetImagesFromByteArray(product.photosUrl);
             if (!string.IsNullOrEmpty(product.Allergens))
             {
@@ -119,7 +122,7 @@ namespace restaurant_demo_website.Controllers
 
             if (product == null)
                 return View("Error");
-            Product[] r = GetRecommendations();
+            IEnumerable<Product> r = await GetRecommendations(id);
 
             var menuDetailView = new MenuDetailsViewModel { ProductInView = product, Recommendations = r.ToList() };
             return View(menuDetailView);
@@ -139,15 +142,15 @@ namespace restaurant_demo_website.Controllers
             return possible;
         }
 
-        private Product[] GetRecommendations()
+        private async Task<IEnumerable<Product>> GetRecommendations(int productid)
         {
-            var rnd = new Random();
-            var r = rnd.GetItems(products.ToArray(), 5);
-            foreach (var product in r)
+
+            var recommendations = await _entitiesRequest.GetCoProductRecommendation(productid);
+            foreach (var product in recommendations)
             {
                 product.imgUrl = GetImagesFromByteArray(product.photosUrl);
             }
-            return r;
+            return recommendations;
         }
 
 
@@ -159,17 +162,19 @@ namespace restaurant_demo_website.Controllers
         /// <returns>Products for a Category</returns>
         public async Task<IActionResult> Category(string categoryName)
         {
+            IEnumerable<Product> CategoryProducts = null;
             var pr = await _entitiesRequest.GetProductsAsync();
             List<string> categories = new List<string>();
-            var CategoryProducts = pr.Where(p => p.Category.Equals(categoryName)&& p.IsDeleted == false).ToList();
-            if (CategoryProducts.Any())
+            var CategoryStocks = pr.Where(p => p.Product.Category.Equals(categoryName)&& p.Product.IsDeleted == false).ToList();
+            if (CategoryStocks.Any())
             {
                 
-                foreach (var p in CategoryProducts)
+                foreach (var p in CategoryStocks)
                 {
-                    p.imgUrl = GetImagesFromByteArray(p.photosUrl);
+                    p.Product.imgUrl = GetImagesFromByteArray(p.Product.photosUrl);
                     
-                    categories.Add(p.Category);
+                    categories.Add(p.Product.Category);
+                    CategoryProducts.Append(p.Product);
                 }
                 categories = categories.Distinct().ToList();
             }

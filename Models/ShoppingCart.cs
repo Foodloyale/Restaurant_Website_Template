@@ -166,7 +166,8 @@ namespace restaurant_demo_website.Models
             order.TotalAmount = orderTotal;
 
             // Generate the payment token for future payment
-            var _paymentObject = new PaymentObject{Amount = (double)orderTotal, OrderId = order.OrderID, Description = $"This order has sum total of {orderTotal}", Currency = "GBP" };
+            var _paymentObject = new PaymentObject{Amount = (double)orderTotal, 
+            OrderId = order.OrderID, Description = $"This order has sum total of {orderTotal}", Currency = "GBP" };
             var paymentToken = await _entitiesRequest.CreateSetupIntent(_paymentObject);
             order.PaymentToken = paymentToken;
 

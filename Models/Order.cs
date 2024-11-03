@@ -21,6 +21,8 @@ namespace FoodloyaleApi.Models
         public string DeliveryAddress { get; set; }
 
         public string? CustomerID {get;set;}
+
+        public int CustomerRecordId {get;set;}
         public string? Username { get; set; }
 
     }

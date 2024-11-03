@@ -3,8 +3,8 @@
     public class OrderDetail
     {
         public string Name {get;set;}
-        public int OrderId { get; internal set; }
-        public decimal UnitPrice { get; internal set; }
-        public int Quantity { get; internal set; }
+        public int OrderId { get; set; }
+        public decimal UnitPrice { get; set; }
+        public int Quantity { get; set; }
     }
 }

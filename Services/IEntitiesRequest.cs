@@ -6,7 +6,8 @@ namespace restaurant_demo_website.Services
 {
     public interface IEntitiesRequest
     {
-        public Task<IEnumerable<Product>> GetProductsAsync();
+        public Task<IEnumerable<Product>> GetCoProductRecommendation(int productid);
+        public Task<IEnumerable<Stocks>> GetProductsAsync();
         public Task<IEnumerable<CartOrder>> GetCartOrdersAsync();
         public Task AddCartOrderAsync(CartOrder cartOrder);
 
@@ -35,5 +36,7 @@ namespace restaurant_demo_website.Services
         Task<VoucherChargeResponse> ChargeVoucher(ChargeVoucherModel c);
 
         Task<ApplicationUser> GetRestaurantInfo();
+        Task UpdateStockAsync(Stocks stock);
+        Task PostStockToQueueAsync(Stocks stock);
     }
 }

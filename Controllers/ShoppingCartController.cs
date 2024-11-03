@@ -48,10 +48,10 @@ namespace restaurant_demo_website.Controllers
         public async Task<ActionResult> AddToCart(int id)
         {
             // Retrieve the album from the database
-            var products = await _entitiesRequest.GetProductsAsync();
-            if(products.Any())
+            var stocks = await _entitiesRequest.GetProductsAsync();
+            if(stocks.Any())
             {
-                var addedProduct = products.FirstOrDefault(p => p.ProductID == id);
+                var addedProduct = stocks.FirstOrDefault(p => p.Product.ProductID == id).Product;
                 // Add it to the shopping cart
                 if(ShoppingCart.ShoppingCartId == null){
                     _shoppingCart.GetCart(this.HttpContext);

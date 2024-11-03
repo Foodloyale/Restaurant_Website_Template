@@ -95,7 +95,9 @@ namespace restaurant_demo_website.Controllers
                     order.OrderDate = DateTime.Now;
                     order.Channel = "Website";
                     order.DeliveryAddress = deliveryAddress;
-                    order.CustomerID =  User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value; ;
+                    order.CustomerID =  User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
+                    order.CustomerRecordId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "RecordId")?.Value);
+
                     
                     
                     //Save Order
@@ -125,20 +127,46 @@ namespace restaurant_demo_website.Controllers
         {
             // Validate customer owns this order
             var orders = await _entitiesRequest.GetOrdersAsync();
-            Order order = orders.SingleOrDefault(
-                o => o.OrderID == id &&
-                o.Username == User.Identity.Name);
+            Order order = orders.SingleOrDefault(o => o.OrderID == id && o.Username == User.Identity.Name);
 
             if (order != null)
             {
 
                 await _entitiesRequest.PostOrderToQueue(order);
+                await FinalizeStock(order);
                 return View(id);
             }
             else
             {
                 return View("Error");
             }
+        }
+
+        private async Task FinalizeStock(Order order)
+        {
+            var stocks = await _entitiesRequest.GetProductsAsync();
+            foreach (var stock in stocks) 
+            {
+                if(stock.IsExpired == false)
+                {
+                    var orderdetails = order.OrderDetails.FirstOrDefault(o => o.Name.Equals(stock.Product.Name));
+                    if (orderdetails != null)
+                    {
+                        stock.RemainingUnits -= orderdetails.Quantity;
+                        //update stock of the remining units
+                        await _entitiesRequest.UpdateStockAsync(stock);
+                    }
+                    
+
+                    //notify of out-of-stock.
+                    if(stock.RemainingUnits == 0)
+                    {
+                        await _entitiesRequest.PostStockToQueueAsync(stock);
+                    }
+                }
+            }
+
+            
         }
     }
 }

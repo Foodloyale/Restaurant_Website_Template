@@ -56,7 +56,6 @@ namespace restaurant_demo_website.Services
         public async Task DeleteCartOrderAsync(CartOrder cartOrder)
         {
            
-            
             var response = await _httpClient.DeleteAsync($"/api/cartorders/{cartOrder.RecordId}");
             response.EnsureSuccessStatusCode();
         }
@@ -71,7 +70,7 @@ namespace restaurant_demo_website.Services
         public async Task<IEnumerable<Order>> GetOrdersAsync()
         {
            
-            IEnumerable<Order> response = await _httpClient.GetFromJsonAsync<IEnumerable<Order>>("/api/Orders");
+            List<Order> response = await _httpClient.GetFromJsonAsync<List<Order>>("/api/Orders");
             return response;
         }
 
@@ -81,14 +80,25 @@ namespace restaurant_demo_website.Services
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task<IEnumerable<Product>> GetProductsAsync()
+        public async Task<IEnumerable<Stocks>> GetProductsAsync()
         {
             
                 
-            IEnumerable<Product> response = await _httpClient.GetFromJsonAsync<IEnumerable<Product>>("/api/products");
+            IEnumerable<Stocks> response = await _httpClient.GetFromJsonAsync<IEnumerable<Stocks>>("/api/inventory/stock");
             return response;
         }
 
+        public async Task UpdateStockAsync(Stocks stock)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"/api/inventory/stock/{stock.Id}", stock);
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task PostStockToQueueAsync(Stocks stock)
+        {
+            var response = await _httpClient.PostAsJsonAsync<Stocks>("/api/queue/stockqueue", stock);
+            response.EnsureSuccessStatusCode();
+        }
         public async Task UpdateCartOrderAsync(CartOrder cartOrder)
         {
             
@@ -172,5 +182,11 @@ namespace restaurant_demo_website.Services
             var response = await _httpClient.GetFromJsonAsync<ApplicationUser>("/api/restaurant");
             return response;
         }
+
+        public async Task<IEnumerable<Product>> GetCoProductRecommendation(int productid)
+        {
+            return await _httpClient.GetFromJsonAsync<IEnumerable<Product>>($"api/recommendation/guestpredictions?productid={productid}");
+        }
+
     }
 }

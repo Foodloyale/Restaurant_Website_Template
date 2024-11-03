@@ -84,6 +84,13 @@ namespace restaurant_demo_website.Areas.Identity.Pages.Account
             [Display(Name = "Email")]
             public string Email { get; set; }
 
+
+
+            [Required]
+            [Phone]
+            [Display(Name = "Phone Number")]
+            public string PhoneNumber {get;set;}
+
           
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -134,8 +141,11 @@ namespace restaurant_demo_website.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-                user.Birthday = Input.Birthday; user.FirstName = Input.FirstName;user.Email = Input.Email; user.LastName = Input.LastName; user.UserName = Input.Email;
+                
+                user.Birthday = Input.Birthday; user.FirstName = Input.FirstName; user.PhoneNumber =Input.PhoneNumber;
+                user.Email = Input.Email; user.LastName = Input.LastName; user.UserName = Input.Email;
                 var NewCustomer = new CustomerTDO { Customer = user, Password = Input.Password };
+
                 Customer result = await _entitiesRequest.CreateCustomerAsync(NewCustomer);
 
                 if (result != null)
@@ -162,7 +172,8 @@ namespace restaurant_demo_website.Areas.Identity.Pages.Account
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, user.Email),
-                        new Claim("UserId", userId)
+                        new Claim("UserId", userId),
+                        new Claim("RecordId", result.RecordId.ToString())
                     };
 
                     var claimsIdentity = new ClaimsIdentity(
