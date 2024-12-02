@@ -22,5 +22,7 @@ namespace restaurant_demo_website.Models
 
         public string Membership { get; set; }
         public long LoyaltyPoints { get; set; }
+
+        public DateTime RegistrationDate {get;set;}
     }
 }

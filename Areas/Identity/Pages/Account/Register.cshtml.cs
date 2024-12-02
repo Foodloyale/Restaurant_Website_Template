@@ -143,7 +143,7 @@ namespace restaurant_demo_website.Areas.Identity.Pages.Account
                 var user = CreateUser();
                 
                 user.Birthday = Input.Birthday; user.FirstName = Input.FirstName; user.PhoneNumber =Input.PhoneNumber;
-                user.Email = Input.Email; user.LastName = Input.LastName; user.UserName = Input.Email;
+                user.Email = Input.Email; user.LastName = Input.LastName; user.UserName = Input.Email; user.RegistrationDate = DateTime.Now;
                 var NewCustomer = new CustomerTDO { Customer = user, Password = Input.Password };
 
                 Customer result = await _entitiesRequest.CreateCustomerAsync(NewCustomer);

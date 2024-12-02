@@ -38,5 +38,7 @@ namespace restaurant_demo_website.Services
         Task<ApplicationUser> GetRestaurantInfo();
         Task UpdateStockAsync(Stocks stock);
         Task PostStockToQueueAsync(Stocks stock);
+        Task<IEnumerable<Voucher>> GetVouchersAsync();
+        Task PostVoucherToQueue(Voucher v);
     }
 }

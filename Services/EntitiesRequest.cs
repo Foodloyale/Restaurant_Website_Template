@@ -188,5 +188,15 @@ namespace restaurant_demo_website.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<Product>>($"api/recommendation/guestpredictions?productid={productid}");
         }
 
+        public async Task<IEnumerable<Voucher>> GetVouchersAsync()
+        {
+           return await _httpClient.GetFromJsonAsync<IEnumerable<Voucher>>("/api/vouchers");
+        }
+
+        public async Task PostVoucherToQueue(Voucher v)
+        {
+           var response = await _httpClient.PostAsJsonAsync<Voucher>("/api/queue/voucher", v);
+           response.EnsureSuccessStatusCode();
+        }
     }
 }

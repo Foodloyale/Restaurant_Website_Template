@@ -105,8 +105,10 @@ namespace restaurant_demo_website.Controllers
                     
                     //Process the order
                     //var cart = ShoppingCart.GetCart(this.HttpContext);
+
                     var paymentToken = await _shoppingCart.CreateOrderAsync(orderAdded);
 
+                    
                 //redirect to payment page
                     var paymentUrl = string.Concat("https://pay.dojo.tech/checkout/", paymentToken);
                     return Redirect(paymentUrl);
@@ -128,6 +130,20 @@ namespace restaurant_demo_website.Controllers
             // Validate customer owns this order
             var orders = await _entitiesRequest.GetOrdersAsync();
             Order order = orders.SingleOrDefault(o => o.OrderID == id && o.Username == User.Identity.Name);
+            IEnumerable<Voucher> vouchers = await _entitiesRequest.GetVouchersAsync();
+            if(vouchers.Any())
+            {
+                vouchers.ToList().ForEach(v=>{
+                    var x = order.OrderDetails.FindAll(o=> v.VoucherNumber == o.Name);
+                    if(x.Any() && v.Units != 0){
+                        var latestunit = v.Units - x.Count;
+                        if(latestunit == 0){
+                            _entitiesRequest.PostVoucherToQueue(v);
+                        }
+                    }
+                });
+            }
+            
 
             if (order != null)
             {
